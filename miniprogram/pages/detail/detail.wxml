@@ -1,0 +1,79 @@
+<view class="container" wx:if="{{!loading && activity}}">
+  <!-- Cover image -->
+  <view class="detail-cover" bindtap="onPreviewImage">
+    <image 
+      class="cover-image" 
+      src="{{activity.coverImage || '/images/default-cover.png'}}" 
+      mode="aspectFill"
+    />
+    <view class="status-badge {{statusClass}}">{{statusText}}</view>
+  </view>
+
+  <!-- Activity info -->
+  <view class="detail-info card">
+    <view class="detail-title">{{activity.title}}</view>
+    
+    <view class="info-row">
+      <text class="info-icon">📅</text>
+      <text class="info-text">{{timeRange}}</text>
+    </view>
+    
+    <view class="info-row">
+      <text class="info-icon">📍</text>
+      <text class="info-text">{{activity.location}}</text>
+    </view>
+    
+    <view class="info-row">
+      <text class="info-icon">👥</text>
+      <text class="info-text">已报名 {{activity.registrationCount || 0}} 人</text>
+    </view>
+
+    <view class="info-row" wx:if="{{activity.fee > 0}}">
+      <text class="info-icon">💰</text>
+      <text class="info-text text-danger">报名费用 ¥{{activity.fee}}</text>
+    </view>
+  </view>
+
+  <!-- Description -->
+  <view class="detail-desc card">
+    <view class="section-title">活动详情</view>
+    <view class="desc-content">{{activity.description}}</view>
+  </view>
+
+  <!-- Action buttons -->
+  <view class="detail-actions safe-bottom">
+    <view class="action-btn" bindtap="onToggleFavorite">
+      <text class="action-icon">{{isFavorited ? '❤️' : '🤍'}}</text>
+      <text class="action-text">{{isFavorited ? '已收藏' : '收藏'}}</text>
+    </view>
+
+    <button class="action-btn" open-type="share">
+      <text class="action-icon">📤</text>
+      <text class="action-text">分享</text>
+    </button>
+
+    <view class="action-main" wx:if="{{!isRegistered && registrationOpen}}">
+      <view class="btn-primary-large" bindtap="onRegister">立即报名</view>
+    </view>
+    <view class="action-main" wx:elif="{{isRegistered}}">
+      <view class="btn-danger-large" bindtap="onCancelRegistration">取消报名</view>
+    </view>
+    <view class="action-main" wx:else>
+      <view class="btn-disabled-large">报名已截止</view>
+    </view>
+  </view>
+
+  <!-- Register modal -->
+  <register-modal 
+    show="{{showRegisterModal}}" 
+    activity="{{activity}}"
+    lastInfo="{{lastRegInfo}}"
+    bind:close="onCloseRegister"
+    bind:submit="onSubmitRegister"
+  />
+</view>
+
+<!-- Loading state -->
+<view class="loading-state" wx:if="{{loading}}">
+  <text>加载中...</text>
+</view>

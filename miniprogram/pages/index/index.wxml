@@ -1,29 +1,62 @@
-<!--index.wxml-->
 <view class="container">
-  <view class="title">快速了解云开发</view>
-  <view class="top_tip">免鉴权接口调用 免部署后台 高并发</view>
-  <view class="power" wx:key="title" wx:for="{{powerList}}" wx:for-item="power">
-    <view class="power_info" data-index="{{index}}" data-type="{{ power.type }}" bindtap="onClickPowerInfo">
-      <view class="power_info_text">
-        <view class="power_info_text_title">
-          {{power.title}}
-          <view class="power_info_text_tag" wx:if="{{power.tag}}">{{power.tag}}</view>
-        </view>
-        <view class="power_info_text_tip">{{power.tip}}</view>
-      </view>
-      <image wx:if="{{!power.showItem && power.item.length}}" class="power_info_more" src="../../images/arrow.svg"></image>
-      <image wx:if="{{power.showItem && power.item.length}}" class="power_info_less" src="../../images/arrow.svg"></image>
-      <image wx:if="{{!power.item.length}}" class="power_item_icon" src="../../images/arrow.svg"></image>
-    </view>
-    <view wx:if="{{power.showItem}}">
-      <view wx:key="title" wx:for="{{power.item}}">
-        <view class="line"></view>
-        <view class="power_item" bindtap="jumpPage" data-type="{{ item.type }}" data-page="{{item.page}}">
-          <view class="power_item_title">{{item.title}}</view>
-          <image class="power_item_icon" src="../../images/arrow.svg"></image>
-        </view>
-      </view>
+  <!-- Search bar -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <icon type="search" size="14" color="#999"></icon>
+      <input 
+        class="search-input" 
+        placeholder="搜索活动" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+      />
+      <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="onClearSearch">✕</view>
     </view>
   </view>
-  <cloud-tip-modal showTipProps="{{showTip}}" title="{{title}}" content="{{content}}"></cloud-tip-modal>
+
+  <!-- Filter tabs -->
+  <view class="filter-bar">
+    <view 
+      class="filter-item {{currentFilter === item.key ? 'filter-active' : ''}}" 
+      wx:for="{{filters}}" 
+      wx:key="key"
+      data-filter="{{item.key}}"
+      bindtap="onFilterChange"
+    >
+      {{item.text}}
+    </view>
+  </view>
+
+  <!-- Admin entry -->
+  <view class="admin-entry" wx:if="{{isAdmin}}" bindtap="goToAdmin">
+    <text>🔧 管理后台</text>
+    <text class="admin-arrow">›</text>
+  </view>
+
+  <!-- Activity list -->
+  <view class="activity-list">
+    <activity-card 
+      wx:for="{{activities}}" 
+      wx:key="_id"
+      activity="{{item}}"
+      bind:tap="onActivityTap"
+    />
+  </view>
+
+  <!-- Empty state -->
+  <view class="empty-state" wx:if="{{isEmpty && !loading}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无活动</text>
+  </view>
+
+  <!-- Loading more -->
+  <view class="loading-more" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- No more -->
+  <view class="loading-more" wx:if="{{!hasMore && activities.length > 0 && !loading}}">
+    <text>— 没有更多了 —</text>
+  </view>
 </view>
