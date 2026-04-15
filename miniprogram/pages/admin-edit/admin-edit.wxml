@@ -1,0 +1,94 @@
+<view class="container">
+  <view class="form-section">
+    <!-- Cover image -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 活动封面</view>
+      <view class="cover-upload" wx:if="{{!coverImageLocal}}" bindtap="onChooseCover">
+        <text class="upload-icon">📷</text>
+        <text class="upload-text">点击上传封面图</text>
+      </view>
+      <view class="cover-preview" wx:else>
+        <image src="{{coverImageLocal}}" mode="aspectFill" class="cover-image"/>
+        <view class="cover-remove" catchtap="onRemoveCover">✕</view>
+      </view>
+    </view>
+
+    <!-- Title -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 活动标题</view>
+      <input 
+        class="form-input" 
+        placeholder="请输入活动标题" 
+        value="{{formData.title}}"
+        bindinput="onInputTitle"
+        maxlength="50"
+      />
+    </view>
+
+    <!-- Description -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 活动描述</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入活动详情描述" 
+        value="{{formData.description}}"
+        bindinput="onInputDescription"
+        maxlength="2000"
+        auto-height
+      />
+    </view>
+
+    <!-- Location -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 活动地点</view>
+      <input 
+        class="form-input" 
+        placeholder="请输入活动地点" 
+        value="{{formData.location}}"
+        bindinput="onInputLocation"
+      />
+    </view>
+
+    <!-- Start date -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 开始日期</view>
+      <picker mode="date" start="{{today}}" value="{{formData.startDate}}" bindchange="onStartDateChange">
+        <view class="form-input picker-value {{formData.startDate ? '' : 'placeholder'}}">
+          {{formData.startDate || '请选择开始日期'}}
+        </view>
+      </picker>
+    </view>
+
+    <!-- End date -->
+    <view class="form-group">
+      <view class="form-label"><text class="required">*</text> 结束日期</view>
+      <picker mode="date" start="{{formData.startDate || today}}" value="{{formData.endDate}}" bindchange="onEndDateChange">
+        <view class="form-input picker-value {{formData.endDate ? '' : 'placeholder'}}">
+          {{formData.endDate || '请选择结束日期'}}
+        </view>
+      </picker>
+    </view>
+
+    <!-- Fee -->
+    <view class="form-group">
+      <view class="form-label">报名费用（元）</view>
+      <input 
+        class="form-input" 
+        type="digit" 
+        placeholder="0 表示免费" 
+        value="{{formData.fee}}"
+        bindinput="onInputFee"
+      />
+      <view class="form-tip" wx:if="{{formData.fee > 0}}">
+        💡 收费活动将在报名后提示用户联系管理员支付。如需接入微信支付，请先完成商户号开通。
+      </view>
+    </view>
+  </view>
+
+  <!-- Submit button -->
+  <view class="submit-area safe-bottom">
+    <view class="btn-primary-large {{submitting ? 'btn-disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '提交中...' : (isEdit ? '保存修改' : '发布活动')}}
+    </view>
+  </view>
+</view>

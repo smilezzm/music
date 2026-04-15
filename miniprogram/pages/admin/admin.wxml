@@ -1,0 +1,55 @@
+<view class="container">
+  <!-- Statistics cards -->
+  <view class="stats-grid">
+    <view class="stat-card">
+      <view class="stat-number">{{statistics.totalActivities}}</view>
+      <view class="stat-label">活动总数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-number">{{statistics.totalRegistrations}}</view>
+      <view class="stat-label">报名总数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-number">{{statistics.activeActivities}}</view>
+      <view class="stat-label">进行中</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-number">{{statistics.todayRegistrations}}</view>
+      <view class="stat-label">今日报名</view>
+    </view>
+  </view>
+
+  <!-- Create button -->
+  <view class="create-btn" bindtap="onCreateActivity">
+    <text>+ 发布新活动</text>
+  </view>
+
+  <!-- Activity management list -->
+  <view class="section-title">活动管理</view>
+  
+  <view class="admin-list">
+    <view class="admin-item" wx:for="{{activities}}" wx:key="_id">
+      <view class="admin-item-main" data-id="{{item._id}}" bindtap="onEditActivity">
+        <view class="admin-item-title">{{item.title}}</view>
+        <view class="admin-item-info">
+          <text>📅 {{item.startDate}} ~ {{item.endDate}}</text>
+        </view>
+        <view class="admin-item-info">
+          <text>👥 {{item.registrationCount || 0}} 人报名</text>
+        </view>
+      </view>
+      <view class="admin-item-actions">
+        <view class="action-link primary" data-id="{{item._id}}" data-title="{{item.title}}" bindtap="onViewRegistrations">名单</view>
+        <view class="action-link" data-id="{{item._id}}" bindtap="onEditActivity">编辑</view>
+        <view class="action-link danger" data-id="{{item._id}}" catchtap="onDeleteActivity">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{activities.length === 0 && !loading}}">
+    <text class="empty-icon">📝</text>
+    <text class="empty-text">暂无活动，点击上方按钮创建</text>
+  </view>
+
+  <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+</view>
