@@ -27,7 +27,7 @@
   <view class="tab-content" wx:if="{{activeTab === 'registrations'}}">
     <view class="list-item" wx:for="{{registrations}}" wx:key="_id" data-id="{{item.activityId}}" bindtap="goToDetail">
       <view class="item-cover">
-        <image src="{{item.activityCover || '/images/default-cover.png'}}" mode="aspectFill" class="item-image"/>
+        <image src="{{item.activityCover || '/images/default-goods-image.png'}}" mode="aspectFill" class="item-image" data-list="registrations" data-index="{{index}}" binderror="onItemCoverError"/>
       </view>
       <view class="item-info">
         <view class="item-title">{{item.activityTitle || '活动'}}</view>
@@ -56,7 +56,7 @@
   <view class="tab-content" wx:if="{{activeTab === 'favorites'}}">
     <view class="list-item" wx:for="{{favorites}}" wx:key="_id" data-id="{{item.activityId}}" bindtap="goToDetail">
       <view class="item-cover">
-        <image src="{{item.activityCover || '/images/default-cover.png'}}" mode="aspectFill" class="item-image"/>
+        <image src="{{item.activityCover || '/images/default-goods-image.png'}}" mode="aspectFill" class="item-image" data-list="favorites" data-index="{{index}}" binderror="onItemCoverError"/>
       </view>
       <view class="item-info">
         <view class="item-title">{{item.activityTitle || '活动'}}</view>

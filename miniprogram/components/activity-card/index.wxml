@@ -2,8 +2,9 @@
   <view class="card-cover">
     <image
       class="cover-image"
-      src="{{activity.coverImage || defaultCover}}"
+      src="{{displayCover}}"
       mode="aspectFill"
+      binderror="onCoverError"
     />
     <view class="status-badge {{statusClass}}">{{statusText}}</view>
   </view>

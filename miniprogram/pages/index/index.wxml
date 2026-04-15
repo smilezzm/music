@@ -40,7 +40,7 @@
       wx:for="{{activities}}" 
       wx:key="_id"
       activity="{{item}}"
-      bind:tap="onActivityTap"
+      bind:activitytap="onActivityTap"
     />
   </view>
 

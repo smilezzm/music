@@ -3,6 +3,9 @@
     <!-- Cover image -->
     <view class="form-group">
       <view class="form-label"><text class="required">*</text> 活动封面</view>
+      <view class="form-tip" wx:if="{{coverImageNeedsRepair}}">
+        当前封面链接已失效，需要重新上传后再保存。
+      </view>
       <view class="cover-upload" wx:if="{{!coverImageLocal}}" bindtap="onChooseCover">
         <text class="upload-icon">📷</text>
         <text class="upload-text">点击上传封面图</text>

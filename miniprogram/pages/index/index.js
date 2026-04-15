@@ -62,17 +62,19 @@ Page({
 
     api.getActivities(params).then(res => {
       const newActivities = res.data || []
-      const allActivities = refresh ? newActivities : that.data.activities.concat(newActivities)
-      
-      that.setData({
-        activities: allActivities,
-        filteredActivities: allActivities,
-        page: that.data.page + 1,
-        hasMore: newActivities.length >= that.data.pageSize,
-        loading: false,
-        isEmpty: allActivities.length === 0
+      return util.resolveCloudFileList(newActivities, 'coverImage').then(resolvedActivities => {
+        const allActivities = refresh ? resolvedActivities : that.data.activities.concat(resolvedActivities)
+
+        that.setData({
+          activities: allActivities,
+          filteredActivities: allActivities,
+          page: that.data.page + 1,
+          hasMore: resolvedActivities.length >= that.data.pageSize,
+          loading: false,
+          isEmpty: allActivities.length === 0
+        })
+        wx.stopPullDownRefresh()
       })
-      wx.stopPullDownRefresh()
     }).catch(err => {
       console.error('Failed to load activities', err)
       that.setData({ loading: false })
@@ -107,6 +109,9 @@ Page({
   // Navigate to activity detail
   onActivityTap: function (e) {
     const id = e.detail.id
+    if (!id) {
+      return
+    }
     wx.navigateTo({
       url: '/pages/detail/detail?id=' + id
     })

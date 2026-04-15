@@ -17,6 +17,8 @@ Page({
       fee: 0
     },
     coverImageLocal: '',
+    coverImageChanged: false,
+    coverImageNeedsRepair: false,
     submitting: false,
     today: '',
     currentTime: ''
@@ -43,19 +45,28 @@ Page({
       const activity = res.data || res
       const startDateTime = util.parseDateTime(activity.startDate)
       const endDateTime = util.parseDateTime(activity.endDate)
-      that.setData({
-        formData: {
-          title: activity.title || '',
-          description: activity.description || '',
-          location: activity.location || '',
-          startDate: activity.startDate ? util.formatDate(startDateTime) : '',
-          startTime: activity.startDate ? util.formatTime(startDateTime) : '09:00',
-          endDate: activity.endDate ? util.formatDate(endDateTime) : '',
-          endTime: activity.endDate ? util.formatTime(endDateTime) : '19:00',
-          coverImage: activity.coverImage || '',
-          fee: activity.fee || 0
-        },
-        coverImageLocal: activity.coverImage || ''
+      const coverImageNeedsRepair = util.isLikelyTempCloudUrl(activity.coverImage)
+      return util.resolveCloudFileUrl(activity.coverImage).then(coverImageUrl => {
+        that.setData({
+          formData: {
+            title: activity.title || '',
+            description: activity.description || '',
+            location: activity.location || '',
+            startDate: activity.startDate ? util.formatDate(startDateTime) : '',
+            startTime: activity.startDate ? util.formatTime(startDateTime) : '09:00',
+            endDate: activity.endDate ? util.formatDate(endDateTime) : '',
+            endTime: activity.endDate ? util.formatTime(endDateTime) : '19:00',
+            coverImage: activity.coverImage || '',
+            fee: activity.fee || 0
+          },
+          coverImageLocal: coverImageUrl || activity.coverImage || '',
+          coverImageChanged: false,
+          coverImageNeedsRepair: coverImageNeedsRepair
+        })
+
+        if (coverImageNeedsRepair) {
+          util.showToast('该活动封面已失效，请重新上传后保存', 'none')
+        }
       })
     }).catch(err => {
       util.hideLoading()
@@ -107,7 +118,11 @@ Page({
       sourceType: ['album', 'camera'],
       success: function (res) {
         const tempFilePath = res.tempFiles[0].tempFilePath
-        that.setData({ coverImageLocal: tempFilePath })
+        that.setData({
+          coverImageLocal: tempFilePath,
+          coverImageChanged: true,
+          coverImageNeedsRepair: false
+        })
       }
     })
   },
@@ -116,6 +131,7 @@ Page({
   onRemoveCover: function () {
     this.setData({
       coverImageLocal: '',
+      coverImageChanged: true,
       'formData.coverImage': ''
     })
   },
@@ -183,6 +199,10 @@ Page({
       util.showToast('费用不能为负数', 'none')
       return false
     }
+    if (this.data.coverImageNeedsRepair && !this.data.coverImageChanged) {
+      util.showToast('当前封面已失效，请重新上传封面图', 'none')
+      return false
+    }
     return true
   },
 
@@ -197,7 +217,12 @@ Page({
 
     // Upload cover image first if needed
     const coverPath = that.data.coverImageLocal
-    that.uploadCoverImage(coverPath).then(coverUrl => {
+    const currentCloudFileId = that.data.formData.coverImage || ''
+    const coverPromise = that.data.coverImageChanged
+      ? that.uploadCoverImage(coverPath)
+      : Promise.resolve(currentCloudFileId)
+
+    coverPromise.then(coverUrl => {
       const formData = that.data.formData
       const data = Object.assign({}, formData, {
         startDate: formData.startDate + ' ' + formData.startTime,

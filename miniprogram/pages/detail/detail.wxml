@@ -3,8 +3,9 @@
   <view class="detail-cover" bindtap="onPreviewImage">
     <image 
       class="cover-image" 
-      src="{{activity.coverImage || '/images/default-cover.png'}}" 
+      src="{{activity.coverImage || '/images/default-goods-image.png'}}" 
       mode="aspectFill"
+      binderror="onCoverError"
     />
     <view class="status-badge {{statusClass}}">{{statusText}}</view>
   </view>

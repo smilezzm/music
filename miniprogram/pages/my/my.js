@@ -45,13 +45,15 @@ Page({
 
     api.getMyRegistrations(that.data.regPage, that.data.pageSize).then(res => {
       const newItems = res.data || []
-      const allItems = refresh ? newItems : that.data.registrations.concat(newItems)
-      that.setData({
-        registrations: allItems,
-        regPage: that.data.regPage + 1,
-        regHasMore: newItems.length >= that.data.pageSize,
-        regLoading: false,
-        regEmpty: allItems.length === 0
+      return util.resolveCloudFileList(newItems, 'activityCover').then(resolvedItems => {
+        const allItems = refresh ? resolvedItems : that.data.registrations.concat(resolvedItems)
+        that.setData({
+          registrations: allItems,
+          regPage: that.data.regPage + 1,
+          regHasMore: resolvedItems.length >= that.data.pageSize,
+          regLoading: false,
+          regEmpty: allItems.length === 0
+        })
       })
     }).catch(err => {
       console.error('Failed to load registrations', err)
@@ -70,13 +72,15 @@ Page({
 
     api.getMyFavorites(that.data.favPage, that.data.pageSize).then(res => {
       const newItems = res.data || []
-      const allItems = refresh ? newItems : that.data.favorites.concat(newItems)
-      that.setData({
-        favorites: allItems,
-        favPage: that.data.favPage + 1,
-        favHasMore: newItems.length >= that.data.pageSize,
-        favLoading: false,
-        favEmpty: allItems.length === 0
+      return util.resolveCloudFileList(newItems, 'activityCover').then(resolvedItems => {
+        const allItems = refresh ? resolvedItems : that.data.favorites.concat(resolvedItems)
+        that.setData({
+          favorites: allItems,
+          favPage: that.data.favPage + 1,
+          favHasMore: resolvedItems.length >= that.data.pageSize,
+          favLoading: false,
+          favEmpty: allItems.length === 0
+        })
       })
     }).catch(err => {
       console.error('Failed to load favorites', err)
@@ -114,5 +118,20 @@ Page({
       this.loadFavorites(true)
     }
     wx.stopPullDownRefresh()
+  },
+
+  onItemCoverError: function (e) {
+    const listName = e.currentTarget.dataset.list
+    const index = e.currentTarget.dataset.index
+    const list = Array.isArray(this.data[listName]) ? this.data[listName].slice() : []
+
+    if (typeof index !== 'number' || !list[index]) {
+      return
+    }
+
+    list[index].activityCover = '/images/default-goods-image.png'
+    this.setData({
+      [listName]: list
+    })
   }
 })

@@ -208,6 +208,117 @@ function showModal(title, content) {
   })
 }
 
+/**
+ * Resolve a cloud file ID to a temporary URL usable by image/audio components
+ * @param {string} fileId
+ * @returns {Promise<string>}
+ */
+function resolveCloudFileUrl(fileId) {
+  return new Promise(function (resolve) {
+    if (!fileId || typeof fileId !== 'string' || fileId.indexOf('cloud://') !== 0) {
+      resolve(fileId || '')
+      return
+    }
+
+    if (!wx.cloud || !wx.cloud.getTempFileURL) {
+      resolve('')
+      return
+    }
+
+    wx.cloud.getTempFileURL({
+      fileList: [fileId],
+      success: function (res) {
+        var file = res.fileList && res.fileList[0]
+        resolve(file && file.tempFileURL ? file.tempFileURL : '')
+      },
+      fail: function () {
+        resolve('')
+      }
+    })
+  })
+}
+
+/**
+ * Resolve cloud file IDs in a list of objects and return shallow-copied items
+ * @param {Array<Object>} items
+ * @param {string} fieldName
+ * @returns {Promise<Array<Object>>}
+ */
+function resolveCloudFileList(items, fieldName) {
+  var list = Array.isArray(items) ? items : []
+  var fileIds = []
+  var idMap = {}
+
+  list.forEach(function (item) {
+    var value = item && item[fieldName]
+    if (typeof value === 'string' && value.indexOf('cloud://') === 0 && !idMap[value]) {
+      idMap[value] = true
+      fileIds.push(value)
+    }
+  })
+
+  if (!fileIds.length || !wx.cloud || !wx.cloud.getTempFileURL) {
+    return Promise.resolve(list.map(function (item) {
+      if (!item || !item[fieldName] || String(item[fieldName]).indexOf('cloud://') !== 0) {
+        return item
+      }
+      return Object.assign({}, item, {
+        [fieldName]: ''
+      })
+    }))
+  }
+
+  return new Promise(function (resolve) {
+    wx.cloud.getTempFileURL({
+      fileList: fileIds,
+      success: function (res) {
+        var tempMap = {}
+        var fileList = res.fileList || []
+        fileList.forEach(function (file) {
+          if (file && file.fileID) {
+            tempMap[file.fileID] = file.tempFileURL || ''
+          }
+        })
+
+        resolve(list.map(function (item) {
+          if (!item || !item[fieldName]) {
+            return item
+          }
+          if (String(item[fieldName]).indexOf('cloud://') !== 0) {
+            return item
+          }
+          return Object.assign({}, item, {
+            [fieldName]: tempMap[item[fieldName]] || ''
+          })
+        }))
+      },
+      fail: function () {
+        resolve(list.map(function (item) {
+          if (!item || !item[fieldName] || String(item[fieldName]).indexOf('cloud://') !== 0) {
+            return item
+          }
+          return Object.assign({}, item, {
+            [fieldName]: ''
+          })
+        }))
+      }
+    })
+  })
+}
+
+/**
+ * Detect whether a URL looks like an expiring signed temp file URL
+ * @param {string} value
+ * @returns {boolean}
+ */
+function isLikelyTempCloudUrl(value) {
+  if (!value || typeof value !== 'string' || !/^https?:\/\//i.test(value)) {
+    return false
+  }
+
+  return /[?&](sign|token|x-amz-signature)=/i.test(value)
+}
+
 module.exports = {
   formatDate: formatDate,
   formatDateTime: formatDateTime,
@@ -223,5 +334,8 @@ module.exports = {
   showToast: showToast,
   showLoading: showLoading,
   hideLoading: hideLoading,
-  showModal: showModal
+  showModal: showModal,
+  isLikelyTempCloudUrl: isLikelyTempCloudUrl,
+  resolveCloudFileUrl: resolveCloudFileUrl,
+  resolveCloudFileList: resolveCloudFileList
 }

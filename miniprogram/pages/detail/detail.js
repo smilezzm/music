@@ -13,6 +13,7 @@ Page({
     statusText: '',
     statusClass: '',
     timeRange: '',
+    defaultCover: '/images/default-goods-image.png',
     loading: true
   },
 
@@ -37,16 +38,21 @@ Page({
     that.setData({ loading: true })
     api.getActivityDetail(id).then(res => {
       const activity = res.data || res
-      const status = util.getActivityStatus(activity.startDate, activity.endDate)
-      that.setData({
-        activity: activity,
-        statusText: util.getStatusText(status),
-        statusClass: 'status-' + status,
-        timeRange: util.formatDateTimeRange(activity.startDate, activity.endDate),
-        registrationOpen: util.isRegistrationOpen(activity.startDate),
-        loading: false
+      return util.resolveCloudFileUrl(activity.coverImage).then(coverImageUrl => {
+        const resolvedActivity = Object.assign({}, activity, {
+          coverImage: coverImageUrl || activity.coverImage || ''
+        })
+        const status = util.getActivityStatus(resolvedActivity.startDate, resolvedActivity.endDate)
+        that.setData({
+          activity: resolvedActivity,
+          statusText: util.getStatusText(status),
+          statusClass: 'status-' + status,
+          timeRange: util.formatDateTimeRange(resolvedActivity.startDate, resolvedActivity.endDate),
+          registrationOpen: util.isRegistrationOpen(resolvedActivity.startDate),
+          loading: false
+        })
+        wx.setNavigationBarTitle({ title: resolvedActivity.title || '活动详情' })
       })
-      wx.setNavigationBarTitle({ title: activity.title || '活动详情' })
     }).catch(err => {
       console.error('Failed to load activity detail', err)
       that.setData({ loading: false })
@@ -205,10 +211,24 @@ Page({
 
   // Preview cover image
   onPreviewImage: function () {
-    if (this.data.activity && this.data.activity.coverImage) {
+    if (
+      this.data.activity &&
+      this.data.activity.coverImage &&
+      this.data.activity.coverImage !== this.data.defaultCover
+    ) {
       wx.previewImage({
         urls: [this.data.activity.coverImage]
       })
     }
+  },
+
+  onCoverError: function () {
+    if (!this.data.activity || this.data.activity.coverImage === this.data.defaultCover) {
+      return
+    }
+
+    this.setData({
+      'activity.coverImage': this.data.defaultCover
+    })
   }
 })
