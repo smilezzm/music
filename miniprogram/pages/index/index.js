@@ -1,185 +1,129 @@
-// index.js
+const api = require('../../utils/api')
+const util = require('../../utils/util')
+
 Page({
   data: {
-    showTip: false,
-    powerList: [
-      {
-        title: "云托管",
-        tip: "不限语言的全托管容器服务",
-        showItem: false,
-        item: [
-          {
-            type: "cloudbaserun",
-            title: "云托管调用",
-          },
-        ],
-      },
-      {
-        title: "云函数",
-        tip: "安全、免鉴权运行业务代码",
-        showItem: false,
-        item: [
-          {
-            type: "getOpenId",
-            title: "获取OpenId",
-          },
-          {
-            type: "getMiniProgramCode",
-            title: "生成小程序码",
-          },
-        ],
-      },
-      {
-        title: "数据库",
-        tip: "安全稳定的文档型数据库",
-        showItem: false,
-        item: [
-          {
-            type: "createCollection",
-            title: "创建集合",
-          },
-          {
-            type: "selectRecord",
-            title: "增删改查记录",
-          },
-          // {
-          //   title: '聚合操作',
-          //   page: 'sumRecord',
-          // },
-        ],
-      },
-      {
-        title: "云存储",
-        tip: "自带CDN加速文件存储",
-        showItem: false,
-        item: [
-          {
-            type: "uploadFile",
-            title: "上传文件",
-          },
-        ],
-      },
-      {
-        title: "AI 接入能力",
-        tip: "云开发 AI 接入能力",
-        showItem: false,
-        item: [
-          {
-            type: "model-guide",
-            title: "大模型对话指引",
-          },
-        ],
-      },
-      {
-        title: "AI 智能开发小程序",
-        tip: "连接 AI 开发工具与 MCP 开发小程序",
-        type: "ai-assistant",
-        skipEnvCheck: true,
-        showItem: false,
-        item: [],
-      },
+    activities: [],
+    filteredActivities: [],
+    searchKeyword: '',
+    currentFilter: 'all',
+    filters: [
+      { key: 'all', text: '全部' },
+      { key: 'upcoming', text: '报名中' },
+      { key: 'ongoing', text: '进行中' },
+      { key: 'ended', text: '已结束' }
     ],
-    haveCreateCollection: false,
-    title: "",
-    content: "",
+    page: 1,
+    pageSize: 10,
+    hasMore: true,
+    loading: false,
+    isAdmin: false,
+    isEmpty: false
   },
-  onClickPowerInfo(e) {
-    const app = getApp();
-    const index = e.currentTarget.dataset.index;
-    const powerList = this.data.powerList;
-    const selectedItem = powerList[index];
-    
-    // 检查是否跳过环境配置检测
-    if (!selectedItem.skipEnvCheck && !app.globalData.env) {
-      wx.showModal({
-        title: "提示",
-        content: "请在 `miniprogram/app.js` 中正确配置 `env` 参数",
-      });
-      return;
-    }
-    if (selectedItem.link) {
-      wx.navigateTo({
-        url: `../web/index?url=${selectedItem.link}&title=${selectedItem.title}`,
-      });
-    } else if (selectedItem.type) {
-      wx.navigateTo({
-        url: `/pages/example/index?envId=${this.data.selectedEnv?.envId}&type=${selectedItem.type}`,
-      });
-    } else if (selectedItem.page) {
-      wx.navigateTo({
-        url: `/pages/${selectedItem.page}/index`,
-      });
-    } else if (
-      selectedItem.title === "数据库" &&
-      !this.data.haveCreateCollection
-    ) {
-      this.onClickDatabase(powerList, selectedItem);
-    } else {
-      selectedItem.showItem = !selectedItem.showItem;
-      this.setData({
-        powerList,
-      });
+
+  onLoad: function () {
+    this.loadActivities(true)
+  },
+
+  onShow: function () {
+    const app = getApp()
+    this.setData({ isAdmin: app.globalData.isAdmin })
+    // Refresh data on show
+    this.loadActivities(true)
+  },
+
+  onPullDownRefresh: function () {
+    this.loadActivities(true)
+  },
+
+  onReachBottom: function () {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadActivities(false)
     }
   },
 
-  jumpPage(e) {
-    const { type, page } = e.currentTarget.dataset;
-    console.log("jump page", type, page);
-    if (type) {
-      wx.navigateTo({
-        url: `/pages/example/index?envId=${this.data.selectedEnv?.envId}&type=${type}`,
-      });
-    } else {
-      wx.navigateTo({
-        url: `/pages/${page}/index?envId=${this.data.selectedEnv?.envId}`,
-      });
+  // Load activities from cloud
+  loadActivities: function (refresh) {
+    if (this.data.loading) return
+    const that = this
+
+    if (refresh) {
+      that.setData({ page: 1, activities: [], hasMore: true })
     }
+
+    that.setData({ loading: true })
+
+    const params = {
+      page: that.data.page,
+      pageSize: that.data.pageSize,
+      status: that.data.currentFilter === 'all' ? '' : that.data.currentFilter,
+      keyword: that.data.searchKeyword
+    }
+
+    api.getActivities(params).then(res => {
+      const newActivities = res.data || []
+      const allActivities = refresh ? newActivities : that.data.activities.concat(newActivities)
+      
+      that.setData({
+        activities: allActivities,
+        filteredActivities: allActivities,
+        page: that.data.page + 1,
+        hasMore: newActivities.length >= that.data.pageSize,
+        loading: false,
+        isEmpty: allActivities.length === 0
+      })
+      wx.stopPullDownRefresh()
+    }).catch(err => {
+      console.error('Failed to load activities', err)
+      that.setData({ loading: false })
+      wx.stopPullDownRefresh()
+      util.showToast('加载失败', 'none')
+    })
   },
 
-  onClickDatabase(powerList, selectedItem) {
-    wx.showLoading({
-      title: "",
-    });
-    wx.cloud
-      .callFunction({
-        name: "quickstartFunctions",
-        data: {
-          type: "createCollection",
-        },
-      })
-      .then((resp) => {
-        if (resp.result.success) {
-          this.setData({
-            haveCreateCollection: true,
-          });
-        }
-        selectedItem.showItem = !selectedItem.showItem;
-        this.setData({
-          powerList,
-        });
-        wx.hideLoading();
-      })
-      .catch((e) => {
-        wx.hideLoading();
-        const { errCode, errMsg } = e;
-        if (errMsg.includes("Environment not found")) {
-          this.setData({
-            showTip: true,
-            title: "云开发环境未找到",
-            content:
-              "如果已经开通云开发，请检查环境ID与 `miniprogram/app.js` 中的 `env` 参数是否一致。",
-          });
-          return;
-        }
-        if (errMsg.includes("FunctionName parameter could not be found")) {
-          this.setData({
-            showTip: true,
-            title: "请上传云函数",
-            content:
-              "在'cloudfunctions/quickstartFunctions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
-          });
-          return;
-        }
-      });
+  // Search input handler
+  onSearchInput: function (e) {
+    this.setData({ searchKeyword: e.detail.value })
   },
-});
+
+  // Search confirm handler
+  onSearch: function () {
+    this.loadActivities(true)
+  },
+
+  // Clear search
+  onClearSearch: function () {
+    this.setData({ searchKeyword: '' })
+    this.loadActivities(true)
+  },
+
+  // Filter by status
+  onFilterChange: function (e) {
+    const filter = e.currentTarget.dataset.filter
+    this.setData({ currentFilter: filter })
+    this.loadActivities(true)
+  },
+
+  // Navigate to activity detail
+  onActivityTap: function (e) {
+    const id = e.detail.id
+    wx.navigateTo({
+      url: '/pages/detail/detail?id=' + id
+    })
+  },
+
+  // Navigate to admin page
+  goToAdmin: function () {
+    wx.navigateTo({
+      url: '/pages/admin/admin'
+    })
+  },
+
+  // Share
+  onShareAppMessage: function () {
+    return {
+      title: '精彩活动等你来参加！',
+      path: '/pages/index/index'
+    }
+  }
+})

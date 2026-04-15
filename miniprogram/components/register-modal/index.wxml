@@ -1,0 +1,56 @@
+<view class="modal-overlay" wx:if="{{show}}" bind:tap="onClose">
+  <view class="modal-card" catch:tap="preventBubble">
+    <view class="modal-header">
+      <text class="modal-title">活动报名</text>
+      <view class="modal-close" bind:tap="onClose">✕</view>
+    </view>
+
+    <view class="modal-body">
+      <view class="quick-fill" wx:if="{{lastInfo}}" bind:tap="onQuickFill">
+        <text class="quick-fill-text">快速填充</text>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">姓名 <text class="required">*</text></text>
+        <input
+          class="form-input"
+          placeholder="请输入姓名"
+          value="{{name}}"
+          bindinput="onNameInput"
+        />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">手机号 <text class="required">*</text></text>
+        <input
+          class="form-input"
+          type="number"
+          maxlength="11"
+          placeholder="请输入手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">微信号 <text class="required">*</text></text>
+        <input
+          class="form-input"
+          placeholder="请输入微信号"
+          value="{{wechatId}}"
+          bindinput="onWechatIdInput"
+        />
+      </view>
+
+      <view class="fee-info" wx:if="{{activity.fee > 0}}">
+        <text class="fee-amount">报名费用: ¥{{activity.fee}}</text>
+        <text class="fee-note">提交报名后将跳转支付</text>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn-cancel" bind:tap="onClose">取消</button>
+      <button class="btn-submit" bind:tap="onSubmit">确认报名</button>
+    </view>
+  </view>
+</view>

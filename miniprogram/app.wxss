@@ -1,27 +1,229 @@
 /**app.wxss**/
+page {
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  font-size: 28rpx;
+  color: #333;
+  box-sizing: border-box;
+}
+
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
   box-sizing: border-box;
-} 
-
-button {
-  background: initial;
 }
 
-button:focus{
+/* Common button styles */
+button {
+  background: initial;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+}
+
+button:focus {
   outline: 0;
 }
 
-button::after{
+button::after {
   border: none;
 }
 
+.btn-primary {
+  background-color: #07C160;
+  color: #fff;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  font-size: 30rpx;
+  text-align: center;
+}
 
-page {
-  background: #f6f6f6;
+.btn-primary-large {
+  background-color: #07C160;
+  color: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx 0;
+  font-size: 32rpx;
+  text-align: center;
+  width: 100%;
+}
+
+.btn-danger {
+  background-color: #ee0a24;
+  color: #fff;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+.btn-outline {
+  background-color: #fff;
+  color: #07C160;
+  border: 2rpx solid #07C160;
+  border-radius: 8rpx;
+  padding: 18rpx 38rpx;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+.btn-disabled {
+  background-color: #c8c9cc;
+  color: #fff;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  font-size: 30rpx;
+  text-align: center;
+}
+
+/* Card styles */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  margin: 20rpx 24rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* Text utilities */
+.text-primary { color: #07C160; }
+.text-danger { color: #ee0a24; }
+.text-warning { color: #ff976a; }
+.text-gray { color: #999; }
+.text-dark { color: #333; }
+.text-small { font-size: 24rpx; }
+.text-normal { font-size: 28rpx; }
+.text-large { font-size: 32rpx; }
+.text-bold { font-weight: bold; }
+.text-center { text-align: center; }
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Flex utilities */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.align-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+
+/* Spacing utilities */
+.mt-10 { margin-top: 10rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-30 { margin-top: 30rpx; }
+.mb-10 { margin-bottom: 10rpx; }
+.mb-20 { margin-bottom: 20rpx; }
+.mb-30 { margin-bottom: 30rpx; }
+.ml-10 { margin-left: 10rpx; }
+.mr-10 { margin-right: 10rpx; }
+.p-20 { padding: 20rpx; }
+.p-30 { padding: 30rpx; }
+
+/* Status tag */
+.status-tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 6rpx;
+  font-size: 22rpx;
+  color: #fff;
+}
+
+.status-upcoming { background-color: #07C160; }
+.status-ongoing { background-color: #1989fa; }
+.status-ended { background-color: #c8c9cc; }
+
+/* Empty state */
+.empty-state {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  color: #999;
+}
+
+.empty-state .empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-state .empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* Loading */
+.loading-more {
+  text-align: center;
+  padding: 20rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* Divider */
+.divider {
+  height: 1rpx;
+  background-color: #ebedf0;
+  margin: 20rpx 0;
+}
+
+/* Form styles */
+.form-group {
+  padding: 20rpx 0;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.form-label .required {
+  color: #ee0a24;
+  margin-right: 4rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  border: 2rpx solid #ebedf0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  border: 2rpx solid #ebedf0;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+/* Overlay / Mask */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+/* Safe bottom area */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }

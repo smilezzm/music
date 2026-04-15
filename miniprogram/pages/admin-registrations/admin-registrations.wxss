@@ -1,0 +1,134 @@
+.container {
+  padding: 24rpx;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* Header */
+.header-info {
+  background: #07C160;
+  color: #fff;
+  border-radius: 12rpx;
+  padding: 32rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.header-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.header-count {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* Export button */
+.export-btn {
+  background: #fff;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  color: #1989fa;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.btn-disabled {
+  color: #c8c9cc;
+  pointer-events: none;
+}
+
+/* Registration list */
+.reg-list {
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.reg-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.reg-item:last-child {
+  border-bottom: none;
+}
+
+.reg-index {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #666;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+  margin-top: 4rpx;
+}
+
+.reg-info {
+  flex: 1;
+}
+
+.reg-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.reg-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4rpx;
+}
+
+.detail-icon {
+  font-size: 22rpx;
+  margin-right: 8rpx;
+}
+
+.detail-link {
+  font-size: 26rpx;
+  color: #1989fa;
+}
+
+.reg-time {
+  font-size: 22rpx;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+/* Empty and loading */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.loading-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 24rpx;
+}

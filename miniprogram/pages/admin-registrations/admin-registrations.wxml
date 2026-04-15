@@ -1,0 +1,41 @@
+<view class="container">
+  <!-- Header info -->
+  <view class="header-info">
+    <view class="header-title">{{activityTitle}}</view>
+    <view class="header-count">共 {{totalCount}} 人报名</view>
+  </view>
+
+  <!-- Export button -->
+  <view class="export-btn {{exporting ? 'btn-disabled' : ''}}" bindtap="onExport">
+    <text>📊 {{exporting ? '导出中...' : '导出Excel'}}</text>
+  </view>
+
+  <!-- Registration list -->
+  <view class="reg-list">
+    <view class="reg-item" wx:for="{{registrations}}" wx:key="_id">
+      <view class="reg-index">{{index + 1}}</view>
+      <view class="reg-info">
+        <view class="reg-name">{{item.name}}</view>
+        <view class="reg-detail" data-phone="{{item.phone}}" bindtap="onCallPhone">
+          <text class="detail-icon">📱</text>
+          <text class="detail-link">{{item.phone}}</text>
+        </view>
+        <view class="reg-detail" data-wechat="{{item.wechatId}}" bindtap="onCopyWechat">
+          <text class="detail-icon">💬</text>
+          <text class="detail-link">{{item.wechatId}}</text>
+        </view>
+      </view>
+      <view class="reg-time">{{item.createdAt || ''}}</view>
+    </view>
+  </view>
+
+  <!-- Empty state -->
+  <view class="empty-state" wx:if="{{registrations.length === 0 && !loading}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无报名记录</text>
+  </view>
+
+  <!-- Loading -->
+  <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+  <view class="loading-more" wx:if="{{!hasMore && registrations.length > 0}}">— 没有更多了 —</view>
+</view>

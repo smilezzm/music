@@ -1,0 +1,24 @@
+<view class="activity-card" bind:tap="onTap">
+  <view class="card-cover">
+    <image
+      class="cover-image"
+      src="{{activity.coverUrl || defaultCover}}"
+      mode="aspectFill"
+    />
+    <view class="status-badge {{statusClass}}">{{statusText}}</view>
+  </view>
+  <view class="card-content">
+    <view class="card-title">{{activity.title}}</view>
+    <view class="card-info">
+      <text class="info-icon">📍</text>
+      <text>{{activity.location}}</text>
+    </view>
+    <view class="card-info">
+      <text class="info-icon">🕐</text>
+      <text>{{timeRange}}</text>
+    </view>
+    <view class="card-footer">
+      <text class="reg-count">👥 已报名 {{activity.regCount || 0}} 人</text>
+    </view>
+  </view>
+</view>

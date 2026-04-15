@@ -1,0 +1,9 @@
+{
+  "name": "registration",
+  "version": "1.0.0",
+  "description": "Registration management cloud function",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.4.0"
+  }
+}
