@@ -20,7 +20,7 @@ Component({
       this.setData({
         statusText: util.getStatusText(status),
         statusClass: 'status-' + status,
-        timeRange: util.formatDate(new Date(activity.startDate)) + ' ~ ' + util.formatDate(new Date(activity.endDate))
+        timeRange: util.formatDateTimeRange(activity.startDate, activity.endDate)
       })
     }
   },

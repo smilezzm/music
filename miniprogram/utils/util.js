@@ -10,12 +10,36 @@ function pad(n) {
 }
 
 /**
+ * Parse a date-like value into a Date object safely across runtimes
+ * @param {string|Date|number} value
+ * @returns {Date}
+ */
+function parseDateTime(value) {
+  if (value instanceof Date) {
+    return value
+  }
+
+  if (typeof value === 'number') {
+    return new Date(value)
+  }
+
+  if (!value) {
+    return new Date('')
+  }
+
+  var normalized = String(value).trim()
+    .replace(/T/, ' ')
+    .replace(/-/g, '/')
+  return new Date(normalized)
+}
+
+/**
  * Format a Date object to 'YYYY-MM-DD'
  * @param {Date} date
  * @returns {string}
  */
 function formatDate(date) {
-  var d = new Date(date)
+  var d = parseDateTime(date)
   return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
 }
 
@@ -25,7 +49,7 @@ function formatDate(date) {
  * @returns {string}
  */
 function formatDateTime(date) {
-  var d = new Date(date)
+  var d = parseDateTime(date)
   return formatDate(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes())
 }
 
@@ -35,8 +59,18 @@ function formatDateTime(date) {
  * @returns {string}
  */
 function formatTime(date) {
-  var d = new Date(date)
+  var d = parseDateTime(date)
   return pad(d.getHours()) + ':' + pad(d.getMinutes())
+}
+
+/**
+ * Format a start/end pair for UI display
+ * @param {string|Date} startDate
+ * @param {string|Date} endDate
+ * @returns {string}
+ */
+function formatDateTimeRange(startDate, endDate) {
+  return formatDateTime(startDate) + ' - ' + formatDateTime(endDate)
 }
 
 /**
@@ -47,8 +81,8 @@ function formatTime(date) {
  */
 function getActivityStatus(startDate, endDate) {
   var now = new Date().getTime()
-  var start = new Date(startDate).getTime()
-  var end = new Date(endDate).getTime()
+  var start = parseDateTime(startDate).getTime()
+  var end = parseDateTime(endDate).getTime()
 
   if (now < start) {
     return 'upcoming'
@@ -93,7 +127,7 @@ function getStatusColor(status) {
  * @returns {boolean}
  */
 function isRegistrationOpen(startDate) {
-  return new Date().getTime() < new Date(startDate).getTime()
+  return new Date().getTime() < parseDateTime(startDate).getTime()
 }
 
 /**
@@ -177,7 +211,9 @@ function showModal(title, content) {
 module.exports = {
   formatDate: formatDate,
   formatDateTime: formatDateTime,
+  formatDateTimeRange: formatDateTimeRange,
   formatTime: formatTime,
+  parseDateTime: parseDateTime,
   getActivityStatus: getActivityStatus,
   getStatusText: getStatusText,
   getStatusColor: getStatusColor,

@@ -10,18 +10,23 @@ Page({
       description: '',
       location: '',
       startDate: '',
+      startTime: '09:00',
       endDate: '',
+      endTime: '19:00',
       coverImage: '',
       fee: 0
     },
     coverImageLocal: '',
     submitting: false,
-    today: ''
+    today: '',
+    currentTime: ''
   },
 
   onLoad: function (options) {
-    const today = util.formatDate(new Date())
-    this.setData({ today: today })
+    const now = new Date()
+    const today = util.formatDate(now)
+    const currentTime = util.formatTime(now)
+    this.setData({ today: today, currentTime: currentTime })
 
     if (options.id) {
       this.setData({ isEdit: true, activityId: options.id })
@@ -36,13 +41,17 @@ Page({
     api.getActivityDetail(id).then(res => {
       util.hideLoading()
       const activity = res.data || res
+      const startDateTime = util.parseDateTime(activity.startDate)
+      const endDateTime = util.parseDateTime(activity.endDate)
       that.setData({
         formData: {
           title: activity.title || '',
           description: activity.description || '',
           location: activity.location || '',
-          startDate: activity.startDate || '',
-          endDate: activity.endDate || '',
+          startDate: activity.startDate ? util.formatDate(startDateTime) : '',
+          startTime: activity.startDate ? util.formatTime(startDateTime) : '09:00',
+          endDate: activity.endDate ? util.formatDate(endDateTime) : '',
+          endTime: activity.endDate ? util.formatTime(endDateTime) : '19:00',
           coverImage: activity.coverImage || '',
           fee: activity.fee || 0
         },
@@ -76,8 +85,16 @@ Page({
     this.setData({ 'formData.startDate': e.detail.value })
   },
 
+  onStartTimeChange: function (e) {
+    this.setData({ 'formData.startTime': e.detail.value })
+  },
+
   onEndDateChange: function (e) {
     this.setData({ 'formData.endDate': e.detail.value })
+  },
+
+  onEndTimeChange: function (e) {
+    this.setData({ 'formData.endTime': e.detail.value })
   },
 
   // Upload cover image
@@ -128,6 +145,8 @@ Page({
   // Validate form
   validateForm: function () {
     const form = this.data.formData
+    const startDateTime = form.startDate && form.startTime ? form.startDate + ' ' + form.startTime : ''
+    const endDateTime = form.endDate && form.endTime ? form.endDate + ' ' + form.endTime : ''
     if (!form.title.trim()) {
       util.showToast('请输入活动标题', 'none')
       return false
@@ -144,12 +163,20 @@ Page({
       util.showToast('请选择开始日期', 'none')
       return false
     }
+    if (!form.startTime) {
+      util.showToast('请选择开始时间', 'none')
+      return false
+    }
     if (!form.endDate) {
       util.showToast('请选择结束日期', 'none')
       return false
     }
-    if (form.startDate > form.endDate) {
-      util.showToast('结束日期不能早于开始日期', 'none')
+    if (!form.endTime) {
+      util.showToast('请选择结束时间', 'none')
+      return false
+    }
+    if (util.parseDateTime(startDateTime).getTime() >= util.parseDateTime(endDateTime).getTime()) {
+      util.showToast('结束时间必须晚于开始时间', 'none')
       return false
     }
     if (form.fee < 0) {
@@ -171,9 +198,14 @@ Page({
     // Upload cover image first if needed
     const coverPath = that.data.coverImageLocal
     that.uploadCoverImage(coverPath).then(coverUrl => {
-      const data = Object.assign({}, that.data.formData, {
+      const formData = that.data.formData
+      const data = Object.assign({}, formData, {
+        startDate: formData.startDate + ' ' + formData.startTime,
+        endDate: formData.endDate + ' ' + formData.endTime,
         coverImage: coverUrl || ''
       })
+      delete data.startTime
+      delete data.endTime
 
       let promise
       if (that.data.isEdit) {

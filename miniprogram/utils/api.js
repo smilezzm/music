@@ -7,10 +7,10 @@
 
 // ─── Helpers ────────────────────────────────────────────────
 
-function callCloud(name, data) {
+function callCloud(functionName, type, data) {
   return wx.cloud.callFunction({
-    name: name,
-    data: data || {}
+    name: functionName,
+    data: Object.assign({ type: type }, data || {})
   }).then(function (res) {
     return res.result
   })
@@ -24,7 +24,7 @@ function callCloud(name, data) {
  */
 function getActivities(params) {
   try {
-    return callCloud('getActivities', params)
+    return callCloud('activity', 'getActivities', params)
   } catch (err) {
     console.error('[api] getActivities failed:', err)
     throw err
@@ -37,7 +37,7 @@ function getActivities(params) {
  */
 function getActivityDetail(activityId) {
   try {
-    return callCloud('getActivityDetail', { activityId: activityId })
+    return callCloud('activity', 'getActivityDetail', { activityId: activityId })
   } catch (err) {
     console.error('[api] getActivityDetail failed:', err)
     throw err
@@ -50,7 +50,7 @@ function getActivityDetail(activityId) {
  */
 function createActivity(data) {
   try {
-    return callCloud('createActivity', data)
+    return callCloud('activity', 'createActivity', data)
   } catch (err) {
     console.error('[api] createActivity failed:', err)
     throw err
@@ -64,7 +64,7 @@ function createActivity(data) {
  */
 function updateActivity(activityId, data) {
   try {
-    return callCloud('updateActivity', {
+    return callCloud('activity', 'updateActivity', {
       activityId: activityId,
       data: data
     })
@@ -80,7 +80,7 @@ function updateActivity(activityId, data) {
  */
 function deleteActivity(activityId) {
   try {
-    return callCloud('deleteActivity', { activityId: activityId })
+    return callCloud('activity', 'deleteActivity', { activityId: activityId })
   } catch (err) {
     console.error('[api] deleteActivity failed:', err)
     throw err
@@ -96,7 +96,7 @@ function deleteActivity(activityId) {
  */
 function register(activityId, userInfo) {
   try {
-    return callCloud('register', {
+    return callCloud('registration', 'register', {
       activityId: activityId,
       userInfo: userInfo
     })
@@ -112,7 +112,7 @@ function register(activityId, userInfo) {
  */
 function cancelRegistration(activityId) {
   try {
-    return callCloud('cancelRegistration', { activityId: activityId })
+    return callCloud('registration', 'cancelRegistration', { activityId: activityId })
   } catch (err) {
     console.error('[api] cancelRegistration failed:', err)
     throw err
@@ -127,7 +127,7 @@ function cancelRegistration(activityId) {
  */
 function getRegistrations(activityId, page, pageSize) {
   try {
-    return callCloud('getRegistrations', {
+    return callCloud('registration', 'getRegistrations', {
       activityId: activityId,
       page: page,
       pageSize: pageSize
@@ -145,7 +145,7 @@ function getRegistrations(activityId, page, pageSize) {
  */
 function getMyRegistrations(page, pageSize) {
   try {
-    return callCloud('getMyRegistrations', {
+    return callCloud('registration', 'getMyRegistrations', {
       page: page,
       pageSize: pageSize
     })
@@ -161,7 +161,7 @@ function getMyRegistrations(page, pageSize) {
  */
 function exportRegistrations(activityId) {
   try {
-    return callCloud('exportRegistrations', { activityId: activityId })
+    return callCloud('export', 'exportRegistrations', { activityId: activityId })
   } catch (err) {
     console.error('[api] exportRegistrations failed:', err)
     throw err
@@ -176,7 +176,7 @@ function exportRegistrations(activityId) {
  */
 function toggleFavorite(activityId) {
   try {
-    return callCloud('toggleFavorite', { activityId: activityId })
+    return callCloud('user', 'toggleFavorite', { activityId: activityId })
   } catch (err) {
     console.error('[api] toggleFavorite failed:', err)
     throw err
@@ -190,7 +190,7 @@ function toggleFavorite(activityId) {
  */
 function getMyFavorites(page, pageSize) {
   try {
-    return callCloud('getMyFavorites', {
+    return callCloud('user', 'getMyFavorites', {
       page: page,
       pageSize: pageSize
     })
@@ -206,7 +206,7 @@ function getMyFavorites(page, pageSize) {
  */
 function checkFavorite(activityId) {
   try {
-    return callCloud('checkFavorite', { activityId: activityId })
+    return callCloud('user', 'checkFavorite', { activityId: activityId })
   } catch (err) {
     console.error('[api] checkFavorite failed:', err)
     throw err
@@ -220,7 +220,7 @@ function checkFavorite(activityId) {
  */
 function checkAdmin() {
   try {
-    return callCloud('checkAdmin')
+    return callCloud('user', 'checkAdmin')
   } catch (err) {
     console.error('[api] checkAdmin failed:', err)
     throw err
@@ -232,7 +232,7 @@ function checkAdmin() {
  */
 function getUserInfo() {
   try {
-    return callCloud('getUserInfo')
+    return callCloud('user', 'getUserInfo')
   } catch (err) {
     console.error('[api] getUserInfo failed:', err)
     throw err
@@ -245,7 +245,7 @@ function getUserInfo() {
  */
 function saveUserInfo(userInfo) {
   try {
-    return callCloud('saveUserInfo', { userInfo: userInfo })
+    return callCloud('user', 'saveUserInfo', { userInfo: userInfo })
   } catch (err) {
     console.error('[api] saveUserInfo failed:', err)
     throw err
@@ -259,7 +259,7 @@ function saveUserInfo(userInfo) {
  */
 function getStatistics() {
   try {
-    return callCloud('getStatistics')
+    return callCloud('activity', 'getStatistics')
   } catch (err) {
     console.error('[api] getStatistics failed:', err)
     throw err

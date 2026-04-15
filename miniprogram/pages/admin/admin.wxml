@@ -32,7 +32,7 @@
       <view class="admin-item-main" data-id="{{item._id}}" bindtap="onEditActivity">
         <view class="admin-item-title">{{item.title}}</view>
         <view class="admin-item-info">
-          <text>📅 {{item.startDate}} ~ {{item.endDate}}</text>
+          <text>📅 {{item.startDate}} - {{item.endDate}}</text>
         </view>
         <view class="admin-item-info">
           <text>👥 {{item.registrationCount || 0}} 人报名</text>

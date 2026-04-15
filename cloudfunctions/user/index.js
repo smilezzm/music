@@ -2,6 +2,27 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+function parseDateTime(value) {
+  if (!value) {
+    return new Date('')
+  }
+
+  let normalized = String(value).trim().replace(/T/, ' ')
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    normalized += ' 00:00:00'
+  }
+  return new Date(normalized.replace(/-/g, '/'))
+}
+
+function formatDateTime(value) {
+  const date = parseDateTime(value)
+  return date.getFullYear() + '-' +
+    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+    String(date.getDate()).padStart(2, '0') + ' ' +
+    String(date.getHours()).padStart(2, '0') + ':' +
+    String(date.getMinutes()).padStart(2, '0')
+}
+
 // Get OpenID
 async function getOpenId(wxContext) {
   return {
@@ -100,11 +121,7 @@ async function toggleFavorite(event, wxContext) {
       activityTitle = activity.title || ''
       activityCover = activity.coverImage || ''
       activityLocation = activity.location || ''
-      const formatDate = (d) => {
-        const date = new Date(d)
-        return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
-      }
-      activityDate = formatDate(activity.startDate) + ' ~ ' + formatDate(activity.endDate)
+      activityDate = formatDateTime(activity.startDate) + ' - ' + formatDateTime(activity.endDate)
     } catch (e) {
       console.log('Failed to get activity info for favorite', e)
     }

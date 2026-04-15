@@ -8,7 +8,7 @@ module.exports = {
   ADMIN_OPENIDS: [],
 
   // Cloud environment ID
-  CLOUD_ENV: 'music',
+  CLOUD_ENV: 'music-9gy2669z5c5fce6a',
 
   // Database collection names
   COLLECTIONS: {

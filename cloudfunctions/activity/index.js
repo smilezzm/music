@@ -4,6 +4,18 @@ const db = cloud.database()
 const _ = db.command
 const $ = db.command.aggregate
 
+function parseDateTime(value, treatDateOnlyAsEndOfDay) {
+  if (!value) {
+    return new Date('')
+  }
+
+  let normalized = String(value).trim().replace(/T/, ' ')
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    normalized += treatDateOnlyAsEndOfDay ? ' 23:59:59' : ' 00:00:00'
+  }
+  return new Date(normalized.replace(/-/g, '/'))
+}
+
 // Get activities list with pagination, filtering, and search
 async function getActivities(event) {
   const { page = 1, pageSize = 10, status = '', keyword = '' } = event
@@ -41,8 +53,8 @@ async function getActivities(event) {
   // Compute status for each activity
   const now = new Date()
   activities = activities.map(a => {
-    const startDate = new Date(a.startDate)
-    const endDate = new Date(a.endDate + ' 23:59:59')
+    const startDate = parseDateTime(a.startDate, false)
+    const endDate = parseDateTime(a.endDate, true)
     let computedStatus = 'upcoming'
     if (now >= startDate && now <= endDate) {
       computedStatus = 'ongoing'
@@ -72,8 +84,8 @@ async function getActivityDetail(event) {
 
   // Compute status
   const now = new Date()
-  const startDate = new Date(activity.startDate)
-  const endDate = new Date(activity.endDate + ' 23:59:59')
+  const startDate = parseDateTime(activity.startDate, false)
+  const endDate = parseDateTime(activity.endDate, true)
   if (now >= startDate && now <= endDate) {
     activity.status = 'ongoing'
   } else if (now > endDate) {
@@ -187,8 +199,8 @@ async function getStatistics(event, wxContext) {
   const now = new Date()
   let activeCount = 0
   allActivities.data.forEach(a => {
-    const start = new Date(a.startDate)
-    const end = new Date(a.endDate + ' 23:59:59')
+    const start = parseDateTime(a.startDate, false)
+    const end = parseDateTime(a.endDate, true)
     if (now >= start && now <= end) {
       activeCount++
     }

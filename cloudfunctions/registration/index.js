@@ -3,6 +3,27 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
 
+function parseDateTime(value, treatDateOnlyAsEndOfDay) {
+  if (!value) {
+    return new Date('')
+  }
+
+  let normalized = String(value).trim().replace(/T/, ' ')
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    normalized += treatDateOnlyAsEndOfDay ? ' 23:59:59' : ' 00:00:00'
+  }
+  return new Date(normalized.replace(/-/g, '/'))
+}
+
+function formatDateTime(value) {
+  const date = parseDateTime(value, false)
+  return date.getFullYear() + '-' +
+    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+    String(date.getDate()).padStart(2, '0') + ' ' +
+    String(date.getHours()).padStart(2, '0') + ':' +
+    String(date.getMinutes()).padStart(2, '0')
+}
+
 // Register for an activity
 async function register(event, wxContext) {
   const { activityId, userInfo } = event
@@ -23,15 +44,9 @@ async function register(event, wxContext) {
   const activity = activityResult.data
 
   const now = new Date()
-  const startDate = new Date(activity.startDate)
+  const startDate = parseDateTime(activity.startDate, false)
   if (now >= startDate) {
     return { success: false, error: '报名已截止' }
-  }
-
-  // Get activity info for registration record
-  const formatDate = (d) => {
-    const date = new Date(d)
-    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
   }
 
   // Create registration
@@ -44,7 +59,7 @@ async function register(event, wxContext) {
       wechatId: userInfo.wechatId,
       activityTitle: activity.title,
       activityCover: activity.coverImage || '',
-      activityDate: formatDate(activity.startDate) + ' ~ ' + formatDate(activity.endDate),
+      activityDate: formatDateTime(activity.startDate) + ' - ' + formatDateTime(activity.endDate),
       activityLocation: activity.location || '',
       createdAt: db.serverDate()
     }

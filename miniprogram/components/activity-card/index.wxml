@@ -2,7 +2,7 @@
   <view class="card-cover">
     <image
       class="cover-image"
-      src="{{activity.coverUrl || defaultCover}}"
+      src="{{activity.coverImage || defaultCover}}"
       mode="aspectFill"
     />
     <view class="status-badge {{statusClass}}">{{statusText}}</view>
@@ -18,7 +18,7 @@
       <text>{{timeRange}}</text>
     </view>
     <view class="card-footer">
-      <text class="reg-count">👥 已报名 {{activity.regCount || 0}} 人</text>
+      <text class="reg-count">👥 已报名 {{activity.registrationCount || 0}} 人</text>
     </view>
   </view>
 </view>

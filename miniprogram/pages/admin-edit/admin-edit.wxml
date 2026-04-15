@@ -51,20 +51,30 @@
 
     <!-- Start date -->
     <view class="form-group">
-      <view class="form-label"><text class="required">*</text> 开始日期</view>
+      <view class="form-label"><text class="required">*</text> 开始时间</view>
       <picker mode="date" start="{{today}}" value="{{formData.startDate}}" bindchange="onStartDateChange">
         <view class="form-input picker-value {{formData.startDate ? '' : 'placeholder'}}">
           {{formData.startDate || '请选择开始日期'}}
+        </view>
+      </picker>
+      <picker mode="time" value="{{formData.startTime}}" bindchange="onStartTimeChange">
+        <view class="form-input picker-value {{formData.startTime ? '' : 'placeholder'}}">
+          {{formData.startTime || '请选择开始时间'}}
         </view>
       </picker>
     </view>
 
     <!-- End date -->
     <view class="form-group">
-      <view class="form-label"><text class="required">*</text> 结束日期</view>
+      <view class="form-label"><text class="required">*</text> 结束时间</view>
       <picker mode="date" start="{{formData.startDate || today}}" value="{{formData.endDate}}" bindchange="onEndDateChange">
         <view class="form-input picker-value {{formData.endDate ? '' : 'placeholder'}}">
           {{formData.endDate || '请选择结束日期'}}
+        </view>
+      </picker>
+      <picker mode="time" value="{{formData.endTime}}" bindchange="onEndTimeChange">
+        <view class="form-input picker-value {{formData.endTime ? '' : 'placeholder'}}">
+          {{formData.endTime || '请选择结束时间'}}
         </view>
       </picker>
     </view>
